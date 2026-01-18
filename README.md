@@ -1,4 +1,4 @@
-# Fitness App (Official Name coming later)
+# Fitness App
 
 ## Project Overview
 
