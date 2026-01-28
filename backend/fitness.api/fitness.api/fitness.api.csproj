@@ -21,7 +21,6 @@
 
     <ItemGroup>
       <Folder Include="Common\" />
-      <Folder Include="Features\Auth\Dtos\" />
       <Folder Include="Features\Users\Dtos\" />
       <Folder Include="Infrastructure\" />
     </ItemGroup>
