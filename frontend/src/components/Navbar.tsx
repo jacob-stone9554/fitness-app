@@ -16,8 +16,8 @@ function Navbar() {
                 </nav>
 
                 <div className="flex items-center gap-3">
-                    <ButtonLink href="/login" variant="ghost" size="sm">Log in</ButtonLink>
-                    <ButtonLink href="/register" variant="primary" size="sm">Get started</ButtonLink>
+                    <ButtonLink href="/#/login" variant="ghost" size="sm">Log in</ButtonLink>
+                    <ButtonLink href="/#/register" variant="primary" size="sm">Get started</ButtonLink>
                 </div>
             </Container>
         </header>
