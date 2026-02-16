@@ -10,13 +10,13 @@ function CTA() {
                     </p>
                     <div className="mt-7 flex flex-col gap-3 sm:flex-row">
                         <a
-                            href="/register"
+                            href="/#/register"
                             className="inline-flex items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-semibold text-neutral-950 hover:bg-white/90"
                         >
                             Get started
                         </a>
                         <a
-                            href="/login"
+                            href="/#/login"
                             className="inline-flex items-center justify-center rounded-xl border border-white/15 bg-white/5 px-5 py-3 text-sm font-semibold text-white hover:bg-white/10"
                         >
                             Log in
