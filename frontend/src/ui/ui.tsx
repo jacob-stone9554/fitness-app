@@ -1,5 +1,13 @@
 import React from "react";
+import { Link, type LinkProps } from "react-router-dom";
 import {cn} from "../lib/cn";
+
+type CommonProps = {
+    variant?: ButtonVariant;
+    size?: ButtonSize;
+    className?: string;
+    children?: React.ReactNode;
+};
 
 export function Container(props: React.HTMLAttributes<HTMLDivElement>) {
     return (
@@ -48,15 +56,24 @@ export function Badge(props: React.HTMLAttributes<HTMLDivElement>) {
 type ButtonVariant = "primary" | "secondary" | "ghost";
 type ButtonSize = "sm" | "md";
 
+type InternalLinkProps = CommonProps &
+    Omit<LinkProps, "className"> & {
+    to: LinkProps["to"];
+};
+
+type ExternalLinkProps = CommonProps &
+    Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, "className" | "href"> & {
+    href: string;
+};
+
+type ButtonLinkProps = InternalLinkProps | ExternalLinkProps;
+
 export function ButtonLink({
                                variant = "primary",
                                size = "md",
                                className,
                                ...props
-                           }: React.AnchorHTMLAttributes<HTMLAnchorElement> & {
-    variant?: ButtonVariant;
-    size?: ButtonSize;
-}) {
+                           }: ButtonLinkProps) {
     const base =
         "inline-flex items-center justify-center rounded-xl font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30";
     const sizes = size === "sm" ? "px-3 py-2 text-sm" : "px-5 py-3 text-sm";
@@ -66,13 +83,17 @@ export function ButtonLink({
         ghost: "text-white/80 hover:text-white",
     };
 
-    return (
-        <a
-            {...props}
-            className={cn(base, sizes, variants[variant], className)}
-        />
-    );
+    const classes = cn(base, sizes, variants[variant], className);
+
+    if ("to" in props) {
+        return <Link {...props} className={classes} />;
+    }
+
+    return <a {...props} className={classes} />;
 }
+
+
+
 
 export function Button({
                            variant = "primary",
