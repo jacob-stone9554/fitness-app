@@ -5,13 +5,4 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineConfig({
     base: "/fitness-app",
     plugins: [react(), tailwindcss()],
-    server: {
-        proxy: {
-            "/api": {
-                target: "https://localhost:7049",
-                changeOrigin: true,
-                secure: false,
-            },
-        },
-    },
 });
