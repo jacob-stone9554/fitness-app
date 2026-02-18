@@ -84,7 +84,7 @@ export default function LoginPage() {
 
                                 <span>
                   New here?{" "}
-                                    <ButtonLink href="/#/register" variant="ghost" size="sm" className="px-1 py-0">
+                  <ButtonLink to="/register" variant="ghost" size="sm" className="px-1 py-0">
                     Create account
                   </ButtonLink>
                 </span>

@@ -103,7 +103,7 @@ export default function RegisterPage() {
 
                             <div className="text-center text-sm text-white/60">
                                 Already have an account?{" "}
-                                <ButtonLink href="/#/login" variant="ghost" size="sm" className="px-1 py-0">
+                                <ButtonLink to="/login" variant="ghost" size="sm" className="px-1 py-0">
                                     Log in
                                 </ButtonLink>
                             </div>
