@@ -23,6 +23,20 @@ var jwtAudience = builder.Configuration["Jwt:Audience"] ?? "fitness.web";
 var jwtKey = builder.Configuration["Jwt:Key"]
     ?? throw new InvalidOperationException("Missing Jwt:Key");
 
+var allowedOrigins = builder.Configuration
+    .GetSection("Cors:AllowedOrigins")
+    .Get<string[]>() ?? Array.Empty<string>();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("frontend", policy =>
+    {
+        policy.WithOrigins(allowedOrigins)
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
 builder.Services
     .AddAuthentication(options =>
     {
@@ -114,6 +128,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("frontend");
 
 app.UseAuthentication();
 app.UseAuthorization();
