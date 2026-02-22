@@ -20,11 +20,11 @@ export type AuthResponse = {
 };
 
 export async function login(body: LoginRequest) {
-    const res = await api.post<AuthResponse>("/api/auth/login", body);
+    const res = await api.post<AuthResponse>("/auth/login", body);
     return res.data;
 }
 
 export async function register(body: RegisterRequest) {
-    const res = await api.post<AuthResponse>("/api/auth/register", body);
+    const res = await api.post<AuthResponse>("/auth/register", body);
     return res.data;
 }
