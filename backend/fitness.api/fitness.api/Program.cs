@@ -6,10 +6,20 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-
+using fitness.api.Infrastructure.Errors;
+using fitness.api.Infrastructure.Middleware;
+using Serilog;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog((ctx, services, config) =>
+{
+    config.ReadFrom.Configuration(ctx.Configuration)
+        .Enrich.FromLogContext()
+        .Enrich.WithProperty("Application", "fitness.api");
+});
 
 builder.Services.AddIdentity<AppUser, IdentityRole<Guid>>(options =>
     {
@@ -59,21 +69,6 @@ builder.Services
             ValidateLifetime = true,
             ClockSkew = TimeSpan.FromMinutes(2)
         };
-        
-        options.Events = new JwtBearerEvents
-        {
-            OnMessageReceived = ctx =>
-            {
-                Console.WriteLine("Auth header present: " +
-                                  ctx.Request.Headers.Authorization.ToString());
-                return Task.CompletedTask;
-            },
-            OnAuthenticationFailed = ctx =>
-            {
-                Console.WriteLine("JWT auth failed: " + ctx.Exception.Message);
-                return Task.CompletedTask;
-            }
-        };
     });
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
@@ -81,6 +76,11 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
+
+builder.Services.AddHealthChecks().AddNpgSql(connectionString);
+
+builder.Services.AddScoped<ErrorHandlingMiddleware>();
+builder.Services.AddScoped<CorrelationIdMiddleware>();
 
 builder.Services.AddControllers();
 builder.Services.AddAuthorization();
@@ -121,6 +121,13 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 
 var app = builder.Build();
 
+app.Lifetime.ApplicationStarted.Register(() =>
+{
+    Log.Information("API Started. Env={env}. Urls={Urls}",
+                    app.Environment.EnvironmentName,
+        string.Join(", ", app.Urls));
+});
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -129,6 +136,19 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseMiddleware<CorrelationIdMiddleware>();
+app.UseMiddleware<ErrorHandlingMiddleware>();
+
+app.UseSerilogRequestLogging(opts =>
+{
+    opts.EnrichDiagnosticContext = (diag, http) =>
+    {
+        diag.Set("TraceId", http.TraceIdentifier);
+        diag.Set("UserId", http.User?.FindFirst("sub")?.Value
+                           ?? http.User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value);
+    };
+});
+
 app.UseCors("frontend");
 
 app.UseAuthentication();
@@ -136,6 +156,18 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+app.MapGet("/health", async (HealthCheckService hc) =>
+    {
+        var report = await hc.CheckHealthAsync();
+        return report.Status == HealthStatus.Healthy
+            ? Results.Ok(new { status = report.Status.ToString() })
+            : Results.Problem(statusCode: StatusCodes.Status503ServiceUnavailable,
+                title: "Unhealthy",
+                detail: report.Status.ToString());
+    })
+    .WithName("health")
+    .WithOpenApi();
 
+app.MapGet("/ping", () => Results.Ok(new { message = "pong" }));
 
 app.Run();
