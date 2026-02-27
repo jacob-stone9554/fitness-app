@@ -1,6 +1,7 @@
 using fitness.api.Data;
 using fitness.api.Data.Entities;
 using fitness.api.Features.Auth.Services;
+using fitness.api.Features.WorkoutLogging.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -117,6 +118,10 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IWorkoutSessionService, WorkoutSessionService>();
+builder.Services.AddScoped<IWorkoutExerciseService, WorkoutExerciseService>();
+builder.Services.AddScoped<IWorkoutSetService, WorkoutSetService>();
 
 
 var app = builder.Build();

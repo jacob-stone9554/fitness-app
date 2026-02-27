@@ -26,6 +26,7 @@
     <ItemGroup>
       <Folder Include="Common\" />
       <Folder Include="Features\Users\Dtos\" />
+      <Folder Include="Features\WorkoutLogging\Services\" />
     </ItemGroup>
 
 </Project>

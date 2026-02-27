@@ -14,6 +14,7 @@ public class WorkoutSet
     [ForeignKey(nameof(WorkoutExerciseId))]
     public WorkoutExercise Exercise { get; set; } = null!;
     
+    [Required]
     public int SetNumber { get; set; }
     
     public int? Reps { get; set; }
