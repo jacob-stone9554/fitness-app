@@ -1,0 +1,37 @@
+services:
+  db:
+    image: postgres:16
+    container_name: fitness_db
+    environment:
+      POSTGRES_USER: ${FITNESS_USER}
+      POSTGRES_PASSWORD: ${FITNESS_PASSWORD}
+      POSTGRES_DB: ${FITNESS_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - fitness_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${FITNESS_USER} -d ${FITNESS_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: fitness.api/fitness.api/Dockerfile
+    container_name: fitness_api
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: ${ConnectionStrings__DefaultConnection}
+      Jwt__Key: ${JWT__Key}
+      Jwt__Issuer: fitness.api
+      Jwt__Audience: fitness.web
+    ports:
+      - "8080:8080"
+
+volumes:
+  fitness_db_data:
