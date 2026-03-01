@@ -175,4 +175,10 @@ app.MapGet("/health", async (HealthCheckService hc) =>
 
 app.MapGet("/ping", () => Results.Ok(new { message = "pong" }));
 
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.Migrate();
+}
+
 app.Run();

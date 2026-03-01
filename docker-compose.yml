@@ -3,15 +3,15 @@ services:
     image: postgres:16
     container_name: fitness_db
     environment:
-      POSTGRES_USER: fitness
-      POSTGRES_PASSWORD: REDACTED
-      POSTGRES_DB: fitness
+      POSTGRES_USER: ${FITNESS_USER}
+      POSTGRES_PASSWORD: ${FITNESS_PASSWORD}
+      POSTGRES_DB: ${FITNESS_DB}
     ports:
       - "5432:5432"
     volumes:
       - fitness_db_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U fitness -d fitness"]
+      test: ["CMD-SHELL", "pg_isready -U ${FITNESS_USER} -d ${FITNESS_DB}"]
       interval: 5s
       timeout: 3s
       retries: 10
@@ -26,7 +26,10 @@ services:
         condition: service_healthy
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      ConnectionStrings__DefaultConnection: Host=db;Port=5432;Database=fitness;Username=fitness;Password=REDACTED
+      ConnectionStrings__DefaultConnection: ${ConnectionStrings__DefaultConnection}
+      Jwt__Key: ${JWT__Key}
+      Jwt__Issuer: fitness.api
+      Jwt__Audience: fitness.web
     ports:
       - "8080:8080"
 
