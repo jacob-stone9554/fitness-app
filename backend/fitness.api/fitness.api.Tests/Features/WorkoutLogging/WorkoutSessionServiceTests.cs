@@ -61,6 +61,7 @@ public class WorkoutSessionServiceTests
 
         var session = new WorkoutSession
         {
+
             Id = Guid.NewGuid(),
             UserId = ownerId,
             StartedAt = DateTimeOffset.UtcNow,
