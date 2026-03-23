@@ -22,5 +22,10 @@ public class UserProfile
     [MaxLength(10)]
     public string Units { get; set; } = "imperial"; // imperial | metric
     
+    public decimal Height { get; set; }
+    public decimal Weight { get; set; }
+    public int DailyCalorieGoal { get; set; }
+    public int Age { get; set; }
+    
     public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
 }

@@ -1,5 +1,6 @@
 using fitness.api.Data.Entities;
 using fitness.api.Data.Entities.Workouts;
+using fitness.api.Data.Entities.Food;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +15,8 @@ public class AppDbContext : IdentityDbContext<AppUser, IdentityRole<Guid>, Guid>
     public DbSet<WorkoutSession> WorkoutSessions => Set<WorkoutSession>();
     public DbSet<WorkoutExercise> WorkoutExercises => Set<WorkoutExercise>();
     public DbSet<WorkoutSet> WorkoutSets => Set<WorkoutSet>();
+    public DbSet<FoodLog> FoodLogs => Set<FoodLog>();
+    public DbSet<FoodItem> FoodItems => Set<FoodItem>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -37,6 +40,11 @@ public class AppDbContext : IdentityDbContext<AppUser, IdentityRole<Guid>, Guid>
         {
             entity.HasIndex(session => new { session.UserId, session.StartedAt });
 
+            entity.HasOne(session => session.User)
+                .WithMany()
+                .HasForeignKey(session => session.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+            
             entity.Property(session => session.Notes).HasMaxLength(2000);
             
             entity.HasMany(session => session.Exercises)
@@ -68,5 +76,30 @@ public class AppDbContext : IdentityDbContext<AppUser, IdentityRole<Guid>, Guid>
 
             entity.HasIndex(set => new { set.WorkoutExerciseId, set.SetNumber });
         });
+
+        modelBuilder.Entity<FoodItem>(entity =>
+        {
+            entity.HasOne(item => item.User)
+                .WithMany()
+                .HasForeignKey(item => item.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+            
+            entity.Property(item => item.Name).HasMaxLength(120).IsRequired();
+            entity.Property(item => item.ServingUnit).HasMaxLength(50).IsRequired();
+        });
+
+        modelBuilder.Entity<FoodLog>(entity =>
+        {
+            entity.HasOne(log => log.FoodItem)
+                .WithMany()
+                .HasForeignKey(log => log.FoodItemId)
+                .OnDelete(DeleteBehavior.Restrict);
+            
+            entity.HasOne(log => log.User)
+                .WithMany()
+                .HasForeignKey(log => log.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
     }
  }
